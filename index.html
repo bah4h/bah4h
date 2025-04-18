@@ -1,623 +1,532 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPS TESTER PRO MAX</title>
+    <meta name="viewport" content="user-scalable=no">
+    <title>volumeshader_bm</title>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --dark: #121212;
-            --light: #ffffff;
-            --accent: #fd79a8;
-            --success: #00b894;
-            --warning: #fdcb6e;
-            --danger: #d63031;
-            --cyber-blue: #00f5ff;
-            --cyber-pink: #ff00f5;
-            --neon-green: #00ff9d;
-        }
-        
-        @font-face {
-            font-family: 'Cyber';
-            src: url('https://fonts.cdnfonts.com/css/cyberpunk') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Cyber', 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: radial-gradient(circle at center, #0f0f1a 0%, #000000 100%);
-            color: var(--light);
-            overflow-x: hidden;
+            background: #131115;
         }
-        
-        .cyber-glitch {
+        #c1 {
+            background: #fbf7fe;
+        }
+        #btn {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
-            pointer-events: none;
-            z-index: -1;
+            left: 0px;
+            top: 0px;
         }
-        
-        .container {
-            width: 95%;
-            max-width: 600px;
-            background: rgba(18, 18, 18, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(108, 92, 231, 0.3),
-                        0 0 60px rgba(253, 121, 168, 0.2),
-                        inset 0 0 20px rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            position: relative;
+        #c1 {
+            position: fixed;
+            left: 0px;
+            top: 0px;
         }
-        
-        h1 {
-            margin-bottom: 20px;
-            color: transparent;
-            font-weight: 700;
-            font-size: 2.5rem;
-            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-pink), var(--neon-green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
-            letter-spacing: 2px;
-            position: relative;
+        #main {
+            transform-origin: 0px 0px;
+            position: fixed;
+            left: 0px;
+            top: 0px;
         }
-        
-        h1::after {
-            content: 'PRO MAX';
-            position: absolute;
-            top: -10px;
-            right: -30px;
-            font-size: 0.8rem;
-            background: var(--danger);
+        #config {
+            position: fixed;
+            left: 0px;
+            top: 30px;
+            display: none;
+        }
+        #fps-counter {
+            position: fixed;
+            right: 10px;
+            top: 10px;
             color: white;
-            padding: 2px 5px;
-            border-radius: 3px;
-            transform: rotate(15deg);
-        }
-        
-        .fps-display {
-            margin: 20px 0;
-            position: relative;
-        }
-        
-        #fpsCounter {
-            font-size: 5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-pink));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
-            font-family: 'Cyber', monospace;
-            line-height: 1;
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .stat-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid rgba(0, 245, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-pink));
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--light);
-            font-family: 'Cyber', monospace;
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-top: 5px;
-            color: var(--secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        #fpsCanvas {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            margin: 20px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 245, 255, 0.2);
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 30px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            font-family: 'Cyber', sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: transform 0.2s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            border: 1px solid rgba(0, 245, 255, 0.3);
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-        }
-        
-        .btn:active {
-            transform: translateY(1px);
-        }
-        
-        .mode-selector {
-            display: flex;
-            justify-content: center;
-            margin: 15px 0;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .mode-btn {
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 245, 255, 0.2);
-            color: var(--light);
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-        }
-        
-        .mode-btn.active {
-            background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-pink));
-            color: black;
-            font-weight: bold;
-        }
-        
-        .history-graph {
-            width: 100%;
-            height: 100px;
-            background: rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
             border-radius: 5px;
-            margin: 20px 0;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0, 245, 255, 0.1);
-        }
-        
-        .graph-point {
-            position: absolute;
-            bottom: 0;
-            width: 3px;
-            background: var(--cyber-blue);
-            border-radius: 2px;
-        }
-        
-        .warning {
-            font-size: 0.85rem;
-            opacity: 0.7;
-            margin-top: 20px;
-            line-height: 1.5;
-            color: var(--warning);
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-                width: 98%;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            #fpsCounter {
-                font-size: 3.5rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-            }
+            z-index: 1000;
         }
     </style>
 </head>
-<body>
-    <div class="cyber-glitch"></div>
+<body style="overflow-x:hidden;overflow-y:hidden">
+<div id="main">
+    <canvas id="c1" width="1024" height="1024">
+        <span>不支持canvas浏览器</span>
+    </canvas>
+</div>
+<div id="fps-counter">FPS: 0</div>
+<button id="btn">CONFIG</button>
+<div id="config">
+    <textarea name="" id="kernel" cols="30" rows="10"></textarea>
+    <br />
+    <button id="apply">APPLY</button>
+    <button id="cancle">CANCLE</button>
+</div>
+<script>
+alert("دروست کراوە لەلایەن Baha Khalid");
+    var cx, cy;
+    var glposition;
+    var glright;
+    var glforward;
+    var glup;
+    var glorigin;
+    var glx;
+    var gly;
+    var gllen;
+    var canvas;
+    var gl;
+    var date = new Date();
+    var md = 0,mx,my;
+    var t2,t1 = date.getTime();
+    var mx = 0, my = 0, mx1 = 0, my1 = 0, lasttimen = 0;
+    var ml = 0, mr = 0, mm = 0;
+    var len = 1.6;
+    var ang1 = 2.8;
+    var ang2 = 0.4;
+    var cenx = 0.0;
+    var ceny = 0.0;
+    var cenz = 0.0;
     
-    <div class="container">
-        <h1>FPS TESTER <span style="position: absolute; top: -10px; right: -30px; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; transform: rotate(15deg); font-size: 0.8rem;">ULTRA</span></h1>
-        
-        <div class="fps-display">
-            <div id="fpsCounter">0</div>
-        </div>
-        
-        <div class="stats-container">
-            <div class="stat-box">
-                <div class="stat-value" id="avgFPS">0</div>
-                <div class="stat-label">Average</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="minFPS">0</div>
-                <div class="stat-label">Minimum</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="maxFPS">0</div>
-                <div class="stat-label">Maximum</div>
-            </div>
-        </div>
-        
-        <div class="mode-selector">
-            <div class="mode-btn active" data-mode="light">Light Test</div>
-            <div class="mode-btn" data-mode="medium">Medium Test</div>
-            <div class="mode-btn" data-mode="heavy">Heavy Test</div>
-            <div class="mode-btn" data-mode="extreme">Extreme</div>
-        </div>
-        
-        <canvas id="fpsCanvas"></canvas>
-        
-        <div class="history-graph" id="historyGraph">
-            <div id="graphPoints"></div>
-        </div>
-        
-        <div class="controls">
-            <button id="startBtn" class="btn btn-primary">Start Benchmark</button>
-            <button id="resetBtn" class="btn btn-secondary">Reset</button>
-        </div>
-        
-        <div class="warning">
-            For accurate results:<br>
-            - Keep this tab active<br>
-            - Disable power saving modes<br>
-            - Close other applications
-        </div>
-    </div>
+    // FPS counter variables
+    var fps = 0;
+    var lastCalledTime;
+    var fpsCount = 0;
+    var fpsStartTime = 0;
+    
+        var KERNEL = "float kernal(vec3 ver){\n" +
+            "   vec3 a;\n" +
+            "float b,c,d,e;\n" +
+            "   a=ver;\n" +
+            "   for(int i=0;i<5;i++){\n" +
+            "       b=length(a);\n" +
+            "       c=atan(a.y,a.x)*8.0;\n" +
+            "       e=1.0/b;\n" +
+            "       d=acos(a.z/b)*8.0;\n" +
+            "       b=pow(b,8.0);\n" +
+            "       a=vec3(b*sin(d)*cos(c),b*sin(d)*sin(c),b*cos(d))+ver;\n" +
+            "       if(b>6.0){\n" +
+            "           break;\n" +
+            "       }\n" +
+            "   }" +
+            "   return 4.0-a.x*a.x-a.y*a.y-a.z*a.z;" +
+            "}";
+    var vertshade;
+    var fragshader;
+    var shaderProgram;
+    
+    function updateFPS() {
+        if (!lastCalledTime) {
+            lastCalledTime = Date.now();
+            fps = 0;
+            return;
+        }
+        var delta = (Date.now() - lastCalledTime)/1000;
+        lastCalledTime = Date.now();
+        fps = 1/delta;
+        document.getElementById('fps-counter').textContent = 'FPS: ' + Math.round(fps);
+    }
+    
+    function ontimer() {
+        updateFPS();
+        ang1+=0.01;
+        draw();
+        window.requestAnimationFrame(ontimer);
+    }
+    
+    document.addEventListener("mousedown",
+        function (ev) {
+            var oEvent = ev || event;
+            if (oEvent.button == 0) {
+                ml = 1;
+                mm = 0;
+            }
+            if (oEvent.button == 2) {
+                mr = 1;
+                mm = 0;
+            }
+            mx = oEvent.clientX;
+            my = oEvent.clientY;
+        },
+        false);
+    document.addEventListener("mouseup",
+        function (ev) {
+            var oEvent = ev || event;
+            if (oEvent.button == 0) {
+                ml = 0;
+            }
+            if (oEvent.button == 2) {
+                mr = 0;
+            }
+        },
+        false);
+    document.addEventListener("mousemove",
+        function (ev) {
+        var oEvent = ev || event;
+        if (ml == 1) {
+            ang1 += (oEvent.clientX - mx) * 0.002;
+            ang2 += (oEvent.clientY - my) * 0.002;
+            if (oEvent.clientX != mx || oEvent.clientY != my) {
+                mm = 1;
+            }
+        }
+        if (mr == 1) {
+            var l = len * 4.0 / (cx + cy);
+            cenx += l * (-(oEvent.clientX - mx) * Math.sin(ang1) - (oEvent.clientY - my) * Math.sin(ang2) * Math.cos(ang1));
+            ceny += l * ((oEvent.clientY - my) * Math.cos(ang2));
+            cenz += l * ((oEvent.clientX - mx) * Math.cos(ang1) - (oEvent.clientY - my) * Math.sin(ang2) * Math.sin(ang1));
+            if (oEvent.clientX != mx || oEvent.clientY != my) {
+                mm = 1;
+            }
+        }
+        mx = oEvent.clientX;
+        my = oEvent.clientY;
+        },
+        false);
+    document.addEventListener("mousewheel",
+        function (ev) {
+            ev.preventDefault();
+            var oEvent = ev || event;
+            len *= Math.exp(-0.001 * oEvent.wheelDelta);
+        },
+        false);
+    document.addEventListener("touchstart",
+        function (ev) {
+            var n = ev.touches.length;
+            if (n == 1) {
+                var oEvent = ev.touches[0];
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+            }
+            else if (n == 2) {
+                var oEvent = ev.touches[0];
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+                oEvent = ev.touches[1];
+                mx1 = oEvent.clientX;
+                my1 = oEvent.clientY;
+            }
+            lasttimen = n;
+        },
+        false);
+    document.addEventListener("touchend",
+        function (ev) {
+            var n = ev.touches.length;
+            if (n == 1) {
+                var oEvent = ev.touches[0];
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+            }
+            else if (n == 2) {
+                var oEvent = ev.touches[0];
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+                oEvent = ev.touches[1];
+                mx1 = oEvent.clientX;
+                my1 = oEvent.clientY;
+            }
+            lasttimen = n;
+        },
+        false);
+    document.addEventListener("touchmove",
+        function (ev) {
+            ev.preventDefault();
+            var n = ev.touches.length;
+            if (n == 1&&lasttimen==1) {
+                var oEvent = ev.touches[0];
+                ang1 += (oEvent.clientX - mx) * 0.002;
+                ang2 += (oEvent.clientY - my) * 0.002;
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+            }
+            else if (n == 2) {
+                var oEvent = ev.touches[0];
+                var oEvent1 = ev.touches[1];
+                var l = len * 2.0 / (cx + cy), l1;
+                cenx += l * (-(oEvent.clientX + oEvent1.clientX - mx - mx1) * Math.sin(ang1) - (oEvent.clientY + oEvent1.clientY - my - my1) * Math.sin(ang2) * Math.cos(ang1));
+                ceny += l * ((oEvent.clientY + oEvent1.clientY - my - my1) * Math.cos(ang2));
+                cenz += l * ((oEvent.clientX + oEvent1.clientX - mx - mx1) * Math.cos(ang1) - (oEvent.clientY + oEvent1.clientY - my - my1) * Math.sin(ang2) * Math.sin(ang1));
+                l1 = Math.sqrt((mx - mx1) * (mx - mx1) + (my - my1) * (my - my1)+1.0);
+                mx = oEvent.clientX;
+                my = oEvent.clientY;
+                mx1 = oEvent1.clientX;
+                my1 = oEvent1.clientY;
+                l = Math.sqrt((mx - mx1) * (mx - mx1) + (my - my1) * (my - my1) + 1.0);
+                len *= l1 / l;
+            }
+            lasttimen = n;
+        },
+        false);
+    document.oncontextmenu = function (event) {
+        if (mm == 1) {
+            event.preventDefault();
+        }
+    };
+    function draw() {
+        date = new Date();
+        var t2 = date.getTime();
+        //ang1 += (t2 - t1)*0.001;
+        t1 = t2;
+        //ang1 += 0.1;
+        gl.uniform1f(glx, cx * 2.0 / (cx + cy));
+        gl.uniform1f(gly, cy * 2.0 / (cx + cy));
+        gl.uniform1f(gllen, len);
+        gl.uniform3f(glorigin, len * Math.cos(ang1) * Math.cos(ang2) + cenx, len * Math.sin(ang2) + ceny, len * Math.sin(ang1) * Math.cos(ang2) + cenz);
+        gl.uniform3f(glright, Math.sin(ang1), 0, -Math.cos(ang1));
+        gl.uniform3f(glup, -Math.sin(ang2) * Math.cos(ang1), Math.cos(ang2), -Math.sin(ang2) * Math.sin(ang1));
+        gl.uniform3f(glforward, -Math.cos(ang1) * Math.cos(ang2), -Math.sin(ang2), -Math.sin(ang1) * Math.cos(ang2));
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        gl.finish();
+    }
+    window.onresize = function () {
+        cx = document.body.clientWidth;
+        cy = document.body.clientHeight;
+        if(cx>cy){
+            cx=cy;
+        }
+        else{
+            cy=cx;
+        }
+        document.getElementById("main").style.width=1024+"px";
+        document.getElementById("main").style.height=1024+"px";
+        document.getElementById("main").style.transform="scale("+cx/1024+","+cy/1024+")";
+    }
+    window.onload = function () {
+        cx = document.body.clientWidth;
+        cy = document.body.clientHeight;
+        if(cx>cy){
+            cx=cy;
+        }
+        else{
+            cy=cx;
+        }
+        document.getElementById("main").style.width=1024+"px";
+        document.getElementById("main").style.height=1024+"px";
+        document.getElementById("main").style.transform="scale("+cx/1024+","+cy/1024+")";
+        var positions = [-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, 1.0, 0.0];
+        var VSHADER_SOURCE =
+            "#version 100 \n"+
+            "precision highp float;\n" +
+            "attribute vec4 position;" +
+            "varying vec3 dir, localdir;" +
+            "uniform vec3 right, forward, up, origin;" +
+            "uniform float x,y;" +
+            "void main() {" +
+            "   gl_Position = position; " +
+            "   dir = forward + right * position.x*x + up * position.y*y;" +
+            "   localdir.x = position.x*x;" +
+            "   localdir.y = position.y*y;" +
+            "   localdir.z = -1.0;" +
+            "} ";
+        var FSHADER_SOURCE =
+            "#version 100 \n" +
+            "#define PI 3.14159265358979324\n" +
+            "#define M_L 0.3819660113\n" +
+            "#define M_R 0.6180339887\n" +
+            "#define MAXR 8\n" +
+            "#define SOLVER 8\n" +
+            "precision highp float;\n" +
+            "float kernal(vec3 ver)\n;" +
+            "uniform vec3 right, forward, up, origin;\n" +
+            "varying vec3 dir, localdir;\n" +
+            "uniform float len;\n" +
+            "vec3 ver;\n" +
+            "int sign;"+
+            "float v, v1, v2;\n" +
+            "float r1, r2, r3, r4, m1, m2, m3, m4;\n" +
+            "vec3 n, reflect;\n" +
+            "const float step = 0.002;\n" +
+            "vec3 color;\n" +
+            "void main() {\n" +
+            "   color.r=0.0;\n" +
+            "   color.g=0.0;\n" +
+            "   color.b=0.0;\n" +
+            "   sign=0;"+
+            "   v1 = kernal(origin + dir * (step*len));\n" +
+            "   v2 = kernal(origin);\n" +
+            "   for (int k = 2; k < 1002; k++) {\n" +
+            "      ver = origin + dir * (step*len*float(k));\n" +
+            "      v = kernal(ver);\n" +
+            "      if (v > 0.0 && v1 < 0.0) {\n" +
+            "         r1 = step * len*float(k - 1);\n" +
+            "         r2 = step * len*float(k);\n" +
+            "         m1 = kernal(origin + dir * r1);\n" +
+            "         m2 = kernal(origin + dir * r2);\n" +
+            "         for (int l = 0; l < SOLVER; l++) {\n" +
+            "            r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "            m3 = kernal(origin + dir * r3);\n" +
+            "            if (m3 > 0.0) {\n" +
+            "               r2 = r3;\n" +
+            "               m2 = m3;\n" +
+            "            }\n" +
+            "            else {\n" +
+            "               r1 = r3;\n" +
+            "               m1 = m3;\n" +
+            "            }\n" +
+            "         }\n" +
+            "         if (r3 < 2.0 * len) {\n" +
+            "               sign=1;" +
+            "            break;\n" +
+            "         }\n" +
+            "      }\n" +
+            "      if (v < v1&&v1>v2&&v1 < 0.0 && (v1*2.0 > v || v1 * 2.0 > v2)) {\n" +
+            "         r1 = step * len*float(k - 2);\n" +
+            "         r2 = step * len*(float(k) - 2.0 + 2.0*M_L);\n" +
+            "         r3 = step * len*(float(k) - 2.0 + 2.0*M_R);\n" +
+            "         r4 = step * len*float(k);\n" +
+            "         m2 = kernal(origin + dir * r2);\n" +
+            "         m3 = kernal(origin + dir * r3);\n" +
+            "         for (int l = 0; l < MAXR; l++) {\n" +
+            "            if (m2 > m3) {\n" +
+            "               r4 = r3;\n" +
+            "               r3 = r2;\n" +
+            "               r2 = r4 * M_L + r1 * M_R;\n" +
+            "               m3 = m2;\n" +
+            "               m2 = kernal(origin + dir * r2);\n" +
+            "            }\n" +
+            "            else {\n" +
+            "               r1 = r2;\n" +
+            "               r2 = r3;\n" +
+            "               r3 = r4 * M_R + r1 * M_L;\n" +
+            "               m2 = m3;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "            }\n" +
+            "         }\n" +
+            "         if (m2 > 0.0) {\n" +
+            "            r1 = step * len*float(k - 2);\n" +
+            "            r2 = r2;\n" +
+            "            m1 = kernal(origin + dir * r1);\n" +
+            "            m2 = kernal(origin + dir * r2);\n" +
+            "            for (int l = 0; l < SOLVER; l++) {\n" +
+            "               r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "               if (m3 > 0.0) {\n" +
+            "                  r2 = r3;\n" +
+            "                  m2 = m3;\n" +
+            "               }\n" +
+            "               else {\n" +
+            "                  r1 = r3;\n" +
+            "                  m1 = m3;\n" +
+            "               }\n" +
+            "            }\n" +
+            "            if (r3 < 2.0 * len&&r3> step*len) {\n" +
+            "                   sign=1;" +
+            "               break;\n" +
+            "            }\n" +
+            "         }\n" +
+            "         else if (m3 > 0.0) {\n" +
+            "            r1 = step * len*float(k - 2);\n" +
+            "            r2 = r3;\n" +
+            "            m1 = kernal(origin + dir * r1);\n" +
+            "            m2 = kernal(origin + dir * r2);\n" +
+            "            for (int l = 0; l < SOLVER; l++) {\n" +
+            "               r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "               if (m3 > 0.0) {\n" +
+            "                  r2 = r3;\n" +
+            "                  m2 = m3;\n" +
+            "               }\n" +
+            "               else {\n" +
+            "                  r1 = r3;\n" +
+            "                  m1 = m3;\n" +
+            "               }\n" +
+            "            }\n" +
+            "            if (r3 < 2.0 * len&&r3> step*len) {\n" +
+            "                   sign=1;" +
+            "               break;\n" +
+            "            }\n" +
+            "         }\n" +
+            "      }\n" +
+            "      v2 = v1;\n" +
+            "      v1 = v;\n" +
+            "   }\n" +
+            "   if (sign==1) {\n" +
+            "      ver = origin + dir*r3 ;\n" +
+                "       r1=ver.x*ver.x+ver.y*ver.y+ver.z*ver.z;" +
+            "      n.x = kernal(ver - right * (r3*0.00025)) - kernal(ver + right * (r3*0.00025));\n" +
+            "      n.y = kernal(ver - up * (r3*0.00025)) - kernal(ver + up * (r3*0.00025));\n" +
+            "      n.z = kernal(ver + forward * (r3*0.00025)) - kernal(ver - forward * (r3*0.00025));\n" +
+            "      r3 = n.x*n.x+n.y*n.y+n.z*n.z;\n" +
+            "      n = n * (1.0 / sqrt(r3));\n" +
+            "      ver = localdir;\n" +
+            "      r3 = ver.x*ver.x+ver.y*ver.y+ver.z*ver.z;\n" +
+            "      ver = ver * (1.0 / sqrt(r3));\n" +
+            "      reflect = n * (-2.0*dot(ver, n)) + ver;\n" +
+            "      r3 = reflect.x*0.276+reflect.y*0.920+reflect.z*0.276;\n" +
+            "      r4 = n.x*0.276+n.y*0.920+n.z*0.276;\n" +
+            "      r3 = max(0.0,r3);\n" +
+            "      r3 = r3 * r3*r3*r3;\n" +
+            "      r3 = r3 * 0.45 + r4 * 0.25 + 0.3;\n" +
+                "      n.x = sin(r1*10.0)*0.5+0.5;\n" +
+                "      n.y = sin(r1*10.0+2.05)*0.5+0.5;\n" +
+                "      n.z = sin(r1*10.0-2.05)*0.5+0.5;\n" +
+            "      color = n*r3;\n" +
+            "   }\n" +
+            "   gl_FragColor = vec4(color.x, color.y, color.z, 1.0);" +
+            "}";
+        canvas = document.getElementById('c1');
+        gl = canvas.getContext('webgl');
+        vertshader = gl.createShader(gl.VERTEX_SHADER);
+        fragshader = gl.createShader(gl.FRAGMENT_SHADER);
+        shaderProgram = gl.createProgram();
+        gl.shaderSource(vertshader, VSHADER_SOURCE);
+        gl.compileShader(vertshader);
+        var infov = gl.getShaderInfoLog(vertshader);
+        gl.shaderSource(fragshader, FSHADER_SOURCE + KERNEL);
+        gl.compileShader(fragshader);
+        var infof = gl.getShaderInfoLog(fragshader);
+        gl.attachShader(shaderProgram, vertshader);
+        gl.attachShader(shaderProgram, fragshader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            var info = gl.getProgramInfoLog(shaderProgram);
+            throw 'Could not compile WebGL program. \n\n' + infov + infof + info;
+        }
+        glposition = gl.getAttribLocation(shaderProgram, 'position');
+        glright = gl.getUniformLocation(shaderProgram, 'right');
+        glforward = gl.getUniformLocation(shaderProgram, 'forward');
+        glup = gl.getUniformLocation(shaderProgram, 'up');
+        glorigin = gl.getUniformLocation(shaderProgram, 'origin');
+        glx = gl.getUniformLocation(shaderProgram, 'x');
+        gly = gl.getUniformLocation(shaderProgram, 'y');
+        gllen = gl.getUniformLocation(shaderProgram, 'len');
+        var buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(glposition, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(glposition);
 
-    <script>
-        // DOM Elements
-        const fpsCounter = document.getElementById('fpsCounter');
-        const avgFPS = document.getElementById('avgFPS');
-        const minFPS = document.getElementById('minFPS');
-        const maxFPS = document.getElementById('maxFPS');
-        const canvas = document.getElementById('fpsCanvas');
-        const ctx = canvas.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const graphPoints = document.getElementById('graphPoints');
-        const modeButtons = document.querySelectorAll('.mode-btn');
-
-        // Set canvas resolution
-        canvas.width = canvas.offsetWidth * 2;
-        canvas.height = canvas.offsetHeight * 2;
-        ctx.scale(2, 2);
-
-        // State variables
-        let frameCount = 0;
-        let lastTime = performance.now();
-        let fps = 0;
-        let fpsHistory = [];
-        let allFPSHistory = [];
-        const avgOverSeconds = 5;
-        let animationId = null;
-        let isRunning = false;
-        let startTimestamp = 0;
-        let testMode = 'light';
-        let benchmarkDuration = 10000; // 10 seconds
-        let testObjects = [];
-        let testComplexity = 1;
-        
-        // Initialize
-        resetTest();
-        
-        // Button event listeners
-        startBtn.addEventListener('click', toggleBenchmark);
-        resetBtn.addEventListener('click', resetTest);
-        
-        // Mode selection
-        modeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                modeButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                testMode = btn.dataset.mode;
-                updateTestComplexity();
-            });
+        gl.viewport(0, 0, 1024, 1024);
+        draw();
+        window.requestAnimationFrame(ontimer);
+        document.getElementById("kernel").value = KERNEL;
+        document.getElementById("btn").addEventListener("click", function() {
+            var state = this.innerText == "CONFIG";
+            this.innerText = state ? "HIDE" : "CONFIG";
+            document.getElementById("config").style.display = state ? "inline" : "none";
         });
-        
-        function updateTestComplexity() {
-            switch(testMode) {
-                case 'light': testComplexity = 1; break;
-                case 'medium': testComplexity = 2; break;
-                case 'heavy': testComplexity = 4; break;
-                case 'extreme': testComplexity = 8; break;
+        document.getElementById("apply").addEventListener("click", function() {
+            KERNEL = document.getElementById("kernel").value;
+            gl.shaderSource(fragshader, FSHADER_SOURCE + KERNEL);
+            gl.compileShader(fragshader);
+            var infof = gl.getShaderInfoLog(fragshader);
+            gl.linkProgram(shaderProgram);
+            gl.useProgram(shaderProgram);
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                var info = gl.getProgramInfoLog(shaderProgram);
+                alert(infof + info);
             }
-        }
-        
-        function createTestObject() {
-            const size = 20 + Math.random() * 30 * testComplexity;
-            const speed = 1 + Math.random() * 2 * testComplexity;
-            
-            testObjects.push({
-                x: Math.random() * (canvas.width/2 - size),
-                y: Math.random() * (canvas.height/2 - size),
-                size: size,
-                speedX: (Math.random() - 0.5) * speed,
-                speedY: (Math.random() - 0.5) * speed,
-                color: `hsla(${Math.random() * 360}, 80%, 60%, 0.8)`,
-                rotation: 0,
-                rotationSpeed: (Math.random() - 0.5) * 0.1 * testComplexity
-            });
-        }
-        
-        function updateTestObjects() {
-            for (let i = 0; i < testObjects.length; i++) {
-                const obj = testObjects[i];
-                
-                obj.x += obj.speedX;
-                obj.y += obj.speedY;
-                obj.rotation += obj.rotationSpeed;
-                
-                // Bounce off walls
-                if (obj.x <= 0 || obj.x >= canvas.width/2 - obj.size) {
-                    obj.speedX *= -1;
-                }
-                if (obj.y <= 0 || obj.y >= canvas.height/2 - obj.size) {
-                    obj.speedY *= -1;
-                }
-            }
-        }
-        
-        function drawTestObjects() {
-            testObjects.forEach(obj => {
-                ctx.save();
-                ctx.translate(obj.x + obj.size/2, obj.y + obj.size/2);
-                ctx.rotate(obj.rotation);
-                
-                ctx.fillStyle = obj.color;
-                
-                if (testComplexity > 2) {
-                    // More complex shapes for higher test modes
-                    ctx.beginPath();
-                    if (testComplexity >= 4) {
-                        // Star shape
-                        const spikes = 5;
-                        const outerRadius = obj.size/2;
-                        const innerRadius = outerRadius * 0.5;
-                        let rot = Math.PI/2 * 3;
-                        
-                        ctx.moveTo(0, 0 - outerRadius);
-                        for (let i = 0; i < spikes; i++) {
-                            ctx.lineTo(0, 0 - innerRadius);
-                            rot += Math.PI / spikes;
-                            ctx.lineTo(Math.sin(rot) * outerRadius, Math.cos(rot) * outerRadius);
-                            rot += Math.PI / spikes;
-                        }
-                        ctx.closePath();
-                    } else {
-                        // Polygon
-                        const sides = 3 + Math.floor(testComplexity);
-                        const size = obj.size/2;
-                        ctx.moveTo(size, 0);
-                        for (let i = 1; i <= sides; i++) {
-                            const angle = i * 2 * Math.PI / sides;
-                            ctx.lineTo(size * Math.cos(angle), size * Math.sin(angle));
-                        }
-                        ctx.closePath();
-                    }
-                    ctx.fill();
-                } else {
-                    // Simple rectangle for light mode
-                    ctx.fillRect(-obj.size/2, -obj.size/2, obj.size, obj.size);
-                }
-                
-                ctx.restore();
-            });
-        }
-        
-        function drawStressTest(now) {
-            // Clear canvas
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.fillRect(0, 0, canvas.width/2, canvas.height/2);
-            
-            // Draw test objects
-            updateTestObjects();
-            drawTestObjects();
-            
-            // Draw center pulse effect for higher modes
-            if (testComplexity > 1) {
-                const pulseSize = (Math.sin(now/200) * 0.5 + 0.5) * 50 * testComplexity;
-                ctx.fillStyle = `hsla(${(now/10) % 360}, 80%, 60%, 0.3)`;
-                ctx.beginPath();
-                ctx.arc(canvas.width/4, canvas.height/4, pulseSize, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        
-        function updateGraph() {
-            graphPoints.innerHTML = '';
-            const graphHeight = 100;
-            const maxFPS = Math.max(60, ...allFPSHistory.slice(-30)) || 60;
-            
-            allFPSHistory.slice(-30).forEach((fps, i) => {
-                const point = document.createElement('div');
-                point.className = 'graph-point';
-                point.style.height = `${(fps / maxFPS) * graphHeight}px`;
-                point.style.left = `${(i / 30) * 100}%`;
-                
-                // Color based on FPS
-                if (fps > 50) point.style.background = 'var(--success)';
-                else if (fps > 30) point.style.background = 'var(--warning)';
-                else point.style.background = 'var(--danger)';
-                
-                graphPoints.appendChild(point);
-            });
-        }
-        
-        function updateFPS(now) {
-            frameCount++;
-            const deltaTime = now - lastTime;
-            
-            if (deltaTime >= 1000) {
-                fps = Math.round((frameCount * 1000) / deltaTime);
-                fpsHistory.push(fps);
-                allFPSHistory.push(fps);
-                
-                if (fpsHistory.length > avgOverSeconds) fpsHistory.shift();
-                
-                // Update displays
-                fpsCounter.textContent = fps;
-                
-                if (fpsHistory.length >= 3) {
-                    const avg = Math.round(fpsHistory.reduce((a, b) => a + b) / fpsHistory.length);
-                    const min = Math.min(...fpsHistory);
-                    const max = Math.max(...fpsHistory);
-                    
-                    avgFPS.textContent = avg;
-                    minFPS.textContent = min;
-                    maxFPS.textContent = max;
-                }
-                
-                frameCount = 0;
-                lastTime = now;
-                
-                // Update graph
-                updateGraph();
-                
-                // Check if benchmark is complete
-                if (isRunning && now - startTimestamp >= benchmarkDuration) {
-                    completeBenchmark();
-                }
-            }
-            
-            if (isRunning) {
-                drawStressTest(now);
-            }
-            animationId = requestAnimationFrame(updateFPS);
-        }
-        
-        function toggleBenchmark() {
-            if (isRunning) {
-                // Stop the benchmark
-                completeBenchmark();
-            } else {
-                // Start a new benchmark
-                startBenchmark();
-            }
-        }
-        
-        function startBenchmark() {
-            startTimestamp = performance.now();
-            lastTime = performance.now();
-            frameCount = 0;
-            fpsHistory = [];
-            testObjects = [];
-            
-            // Create initial test objects
-            for (let i = 0; i < testComplexity * 2; i++) {
-                createTestObject();
-            }
-            
-            animationId = requestAnimationFrame(updateFPS);
-            startBtn.textContent = 'STOP BENCHMARK';
-            isRunning = true;
-        }
-        
-        function completeBenchmark() {
-            cancelAnimationFrame(animationId);
-            isRunning = false;
-            startBtn.textContent = 'START BENCHMARK';
-            
-            // Clear canvas when stopped
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(0, 0, canvas.width/2, canvas.height/2);
-        }
-        
-        function resetTest() {
-            if (isRunning) {
-                cancelAnimationFrame(animationId);
-                isRunning = false;
-            }
-            
-            fpsCounter.textContent = '0';
-            avgFPS.textContent = '0';
-            minFPS.textContent = '0';
-            maxFPS.textContent = '0';
-            
-            fpsHistory = [];
-            allFPSHistory = [];
-            frameCount = 0;
-            lastTime = performance.now();
-            testObjects = [];
-            
-            startBtn.textContent = 'START BENCHMARK';
-            
-            // Clear canvas and graph
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(0, 0, canvas.width/2, canvas.height/2);
-            graphPoints.innerHTML = '';
-        }
-        
-        // Start the FPS counter (without animation)
-        animationId = requestAnimationFrame(updateFPS);
+            glposition = gl.getAttribLocation(shaderProgram, 'position');
+            glright = gl.getUniformLocation(shaderProgram, 'right');
+            glforward = gl.getUniformLocation(shaderProgram, 'forward');
+            glup = gl.getUniformLocation(shaderProgram, 'up');
+            glorigin = gl.getUniformLocation(shaderProgram, 'origin');
+            glx = gl.getUniformLocation(shaderProgram, 'x');
+            gly = gl.getUniformLocation(shaderProgram, 'y');
+            gllen = gl.getUniformLocation(shaderProgram, 'len');
+        });
+        document.getElementById("cancle").addEventListener("click", function() {
+            document.getElementById("kernel").value = KERNEL;
+        });
+    }
     </script>
 </body>
 </html>
